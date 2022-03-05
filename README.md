@@ -13,7 +13,6 @@ This only needs QModManager.
 ## Installation
 
 Just grab a version of your choice from Releases and put that in QMods folder.
-pip install foobar
 
 ## Supported languages
 
