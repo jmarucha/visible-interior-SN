@@ -1,6 +1,6 @@
 ﻿{
     "Id": "lockerMod",
-    "DisplayName": "lockerMod",
+    "DisplayName": "Visible Locker Content",
     "Author": "Jan Marucha",
     "Version": "1.0.0",
     "Enable": true,
