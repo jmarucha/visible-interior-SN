@@ -1,0 +1,10 @@
+﻿{
+    "Id": "lockerMod",
+    "DisplayName": "lockerMod",
+    "Author": "Jan Marucha",
+    "Version": "1.0.0",
+    "Enable": true,
+    "AssemblyName": "lockerMod.dll",
+    "VersionDependencies": {},
+    "Game": "Subnautica"
+}
