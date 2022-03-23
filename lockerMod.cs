@@ -34,7 +34,7 @@ namespace lockerMod_SN
         static readonly int w = 6;
         static readonly int h = 6;
         static readonly float[] xDispl = {0.44f, 0.264f, 0.088f, -0.088f, -0.264f, -0.44f};
-        static readonly float[] yDispl = { 1.59f, 1.35f, .97f, 0.59f, 0.28f, 0.05f};
+        static readonly float[] yDispl = { 1.59f, 1.33f, .97f, 0.59f, 0.28f, 0.05f};
         GameObject[,] slots;
         GameObject root;
         public VisibleInterior(Transform locker)
@@ -80,45 +80,52 @@ namespace lockerMod_SN
         }
         static void CopyMeshes(GameObject source, GameObject target)
         {
-            GameObject meshContainer = new GameObject("MeshContainer");
-            meshContainer.transform.SetParent(target.transform, false);
-            meshContainer.transform.localPosition = Vector3.zero;
-            meshContainer.transform.localRotation = Quaternion.identity;
+            GameObject copy = GameObject.Instantiate(source);
+            copy.SetActive(true);
+            copy.transform.SetParent(target.transform, false);
+            copy.transform.localScale = Vector3.one;
+            copy.transform.localRotation = Quaternion.identity;
 
-            Renderer[] componentList = source.GetComponentsInChildren<MeshRenderer>(true);
-
-            if (componentList.Length == 0)
+            Pickupable pickupable = copy.GetComponent<Pickupable>();
+            if (pickupable != null)
             {
-                //fallback for fish
-                CopyModelByName(source.transform, meshContainer);
-                RescaleContainer(meshContainer);
-                return;
+                pickupable.DisableBehaviours();
+                pickupable.DisableColliders();
+                pickupable.DisableRigidbodies();
+                ApplyExceptions(target, pickupable.GetTechType());
             }
-
-            foreach (Renderer component in componentList)
+            foreach (Collider collider in copy.GetComponents<Collider>()) // previous thingy didn't work with stuff with two colliders
             {
-                if (component.gameObject.name.Contains("_fp"))
+                if (collider != null)
                 {
-                    continue;
-                }
-                if (Array.Exists(blacklist, element => element == component.gameObject.name))
-                {
-                    continue;
+                    collider.enabled = false;
                 }
 
-                GameObject meshObject = UnityEngine.Object.Instantiate(component.gameObject);
-                meshObject.transform.SetParent(meshContainer.transform, false);
             }
-            RescaleContainer(meshContainer);
+            SanitizeObject(copy);
+            RescaleContainer(copy);
+
         }
-        static bool CopyModelByName(Transform source, GameObject meshContainer)
+
+        private static void ApplyExceptions(GameObject target, TechType techType)
         {
-            Transform meshObjectOriginal = source.Find("model");
-            if (meshObjectOriginal == null) return false;
-            GameObject meshObject = UnityEngine.Object.Instantiate(meshObjectOriginal.gameObject);
-            meshObject.transform.SetParent(meshContainer.transform, false);
-            return true;
+            if (techType == TechType.Salt)
+            {
+                target.transform.localPosition += -0.03f * Vector3.up;
+            }
         }
+
+        private static void SanitizeObject(GameObject target)
+        {
+            foreach (Transform child in target.transform)
+            {
+                if (child.name.StartsWith("x"))
+                {
+                    child.gameObject.SetActive(false);
+                }
+            }
+        }
+
         static void RescaleContainer(GameObject meshContainer)
         {
 
@@ -148,7 +155,6 @@ namespace lockerMod_SN
             }
             return b;
         }
-        static readonly string[] blacklist = { "fire_extinguisher_handle_01_tp", "x_flashlightC0one" };
         public static void EnsureDestructionOfPreviousInterior(Transform locker)
         {
             Transform interior = locker.Find(childName);

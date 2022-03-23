@@ -17,7 +17,6 @@ namespace lockerMod_SN
             Harmony harmony = new Harmony(modName);
             harmony.PatchAll(assembly);
             Logger.Log(Logger.Level.Info, "Patched successfully!");
-
         }
     }
 }
