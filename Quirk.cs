@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace lockerMod_SN {
+
+namespace VisibleLockerInterior {
     internal class PrefabId {
         public const string AirBladder = "d98d673a-8992-4486-a49c-81aa058e51dc";
         public const string Battery = "d4bfebc0-a5e6-47d3-b4a7-d5e47f614ed6";
@@ -36,7 +37,6 @@ namespace lockerMod_SN {
     }
 
     internal class Quirk {
-
         public static Quaternion GetIdealRotationByTechType(TechType techType) {
             switch (techType) {
                 case TechType.PipeSurfaceFloater:
@@ -179,7 +179,6 @@ namespace lockerMod_SN {
                 { PrefabId.StalkerTooth, new Quaternion(0.207908f, 0.632674f, -0.05149f, 0.744208f) },
                 { PrefabId.stillSuit, new Quaternion(0.021813f, -0.000267f, 0.012214f, 0.999687f) },
                 { PrefabId.Tank, new Quaternion(0.4531f, 0.542863f, 0.542863f, 0.4531f) },
-
             };
 
         public static readonly Dictionary<string, Bounds> overrideBounds =
