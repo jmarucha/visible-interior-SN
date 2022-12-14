@@ -1,10 +1,10 @@
 ﻿{
-    "Id": "lockerMod",
+    "Id": "VisibleLockerInterior",
     "DisplayName": "Visible Locker Content",
-    "Author": "Jan Marucha",
+    "Author": "Jan Marucha and HenryJk",
     "Version": "2.0.0",
     "Enable": true,
-    "AssemblyName": "lockerMod.dll",
+    "AssemblyName": "VisibleLockerInterior.dll",
     "VersionDependencies": {},
     "Game": "Subnautica"
 }

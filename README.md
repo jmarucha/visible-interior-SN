@@ -8,24 +8,28 @@ This mod adds the display of items on the glass inside of the locker.
 
 ## Requirements
 
-This only needs QModManager.
+BepInEx 5 - latest
 
 ## Installation
 
-Just grab a version of your choice from Releases and put that in QMods folder.
-
-## Supported languages
-
-This mod does well in wide selection of languages, probably because it doesn't contain any word and nothing needs to be translated
+Download released files and unpack it to BepInEx/plugins folder.
 
 ## Known issues
 
-Some of the items won't display correctly. The process of identyfing elements of original item that have to be copied is very heuristic and multiple exceptions are needed to be implemented.
+Swim charge fins and Ultra glide fins will appear very dark without
+shining direct light (e.g. flashlight) upon them. The bug exist in
+the original object so our best bet is to wait for the fix in vanilla.
 
 ## Contributing
 
-Any kind of feedback is welcome, and contributions as well. Feel free to open the issue, start pull request or whatever.
+This mod is compiled using visual studio community edition. You may
+also need to publicize 2 subnautica assemblies: CSharp.dll and
+CSharp-firstpass.dll in Subnautica_Data/Managed folder so that you
+can use private method freely without using tedious methods like
+reflection. Refer to
+[this](https://github.com/CabbageCrow/AssemblyPublicizer) guide
+to learn how to publicize assemblies
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/), duh.
+[MIT](https://choosealicense.com/licenses/mit/)

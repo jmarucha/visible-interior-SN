@@ -1,58 +1,32 @@
-﻿using HarmonyLib;
-using System;
+﻿using System;
 using UnityEngine;
-using Logger = QModManager.Utility.Logger;
 using System.Linq;
 using System.Collections.Generic;
 
-
-namespace lockerMod_SN {
-
-    [HarmonyPatch(typeof(StorageContainer))]
-    [HarmonyPatch(nameof(StorageContainer.Awake))]
-    internal class PatchStorageContainerConstructor {
-        [HarmonyPostfix]
-        public static void Postfix(StorageContainer __instance) {
-            VisibleInterior.UpdateInterior(__instance);
-        }
-    }
-
-    [HarmonyPatch(typeof(StorageContainer))]
-    [HarmonyPatch(nameof(StorageContainer.OnClose))]
-    internal class PatchCloseAction {
-        [HarmonyPostfix]
-        public static void Postfix(StorageContainer __instance) {
-            VisibleInterior.UpdateInterior(__instance);
-        }
-    }
-
-    internal class LockerModData : MonoBehaviour {
-        public TechType type;
-        public string classId;
-    }
-
-    internal class VisibleInterior {
-        private const string interiorName = "LockerInterior";
+namespace VisibleLockerInterior {
+    internal class Controller {
+        private const string interiorName = "mod_LockerInterior";
         private const int itemPerRow = 8;
-        private static readonly float[] xDispl =
+        private static readonly float[] xPos =
             { 0.469f, 0.335f, 0.201f, 0.067f, -0.067f, -0.201f, -0.335f, -0.469f };
-        private static readonly float[] yDispl =
+        private static readonly float[] yPos =
             { 1.58803f, 1.32938f, 0.966707f, 0.57335f, 0.288304f, 0.046258f };
-        private const float zDispl = -0.03f;
-        
-        public static void UpdateInterior(StorageContainer storageContainer) {
-            if ("Locker(Clone)" != storageContainer.prefabRoot.name) return;
-            var interior = GetInteriorInstance(storageContainer);
-            var items = GetSortedItems(storageContainer.storageRoot.gameObject);
+        private const float zPos = -0.03f;
+
+        public static void UpdateInterior(StorageContainer sc) {
+            if ("Locker(Clone)" != sc.prefabRoot.name) return;
+            var interior = GetInteriorInstance(sc);
+            var items = GetSortedItems(sc.storageRoot.gameObject);
             var dummies = GetSortedDummies(interior);
             for (int i = 0, j = 0; i < items.Count || j < dummies.Count;) {
-                var targetPosition = new Vector3(xDispl[i % itemPerRow], yDispl[i / itemPerRow], zDispl);
+                var targetPosition =
+                    new Vector3(xPos[i % itemPerRow], yPos[i / itemPerRow], zPos);
                 int cmp = 
                     i == items.Count ? 1 :
                     j == dummies.Count ? -1 :
                     CompareTechType(
                         items[i].GetComponent<Pickupable>().GetTechType(),
-                        dummies[j].GetComponent<LockerModData>().type
+                        dummies[j].GetComponent<VisibleLockerInteriorDummyData>().techType
                         );
                 if (cmp == -1) {
                     var dummy = CreateDummy(interior, items[i]);
@@ -68,17 +42,15 @@ namespace lockerMod_SN {
             }
         }
 
-        private static GameObject CreateDummy(GameObject interior, GameObject source) {
-            var dummy = GameObject.Instantiate(source, interior.transform);
-            var pickupable = source.GetComponent<Pickupable>();
-            var techType = pickupable?.GetTechType() ?? TechType.None;
-            var prefabIdentifier = source.GetComponent<PrefabIdentifier>();
-            var classId = prefabIdentifier?.ClassId ?? "";
+        private static GameObject CreateDummy(GameObject interior, GameObject src) {
+            var dummy = GameObject.Instantiate(src, interior.transform);
+            var techType = src.GetComponent<Pickupable>()?.GetTechType() ?? TechType.None;
+            var classId = src.GetComponent<PrefabIdentifier>()?.ClassId ?? "";
             dummy.SetActive(true);
             SanitizeObject(dummy, techType);
-            var dummyComp = dummy.AddComponent<LockerModData>();
-            dummyComp.type = techType;
-            dummyComp.classId = classId;
+            var dummyComp = dummy.AddComponent<VisibleLockerInteriorDummyData>();
+            dummyComp.techType = techType;
+            dummyComp.prefabId = classId;
             return dummy;
         }
 
@@ -129,15 +101,16 @@ namespace lockerMod_SN {
         }
 
         private static Quaternion GetIdealRotation(GameObject dummy) {
-            var comp = dummy.GetComponent<LockerModData>();
-            return Quirk.overrideRotation.ContainsKey(comp.classId) ?
-                Quirk.overrideRotation[comp.classId] :
-                Quirk.GetIdealRotationByTechType(comp.type);
+            var comp = dummy.GetComponent<VisibleLockerInteriorDummyData>();
+            return Quirk.overrideRotation.ContainsKey(comp.prefabId) ?
+                Quirk.overrideRotation[comp.prefabId] :
+                Quirk.GetIdealRotationByTechType(comp.techType);
         }
 
         private static Bounds GetIdealBounds(GameObject dummy) {
-            var comp = dummy.GetComponent<LockerModData>();
-            if (Quirk.overrideBounds.ContainsKey(comp.classId)) return Quirk.overrideBounds[comp.classId];
+            var comp = dummy.GetComponent<VisibleLockerInteriorDummyData>();
+            if (Quirk.overrideBounds.ContainsKey(comp.prefabId)) 
+                return Quirk.overrideBounds[comp.prefabId];
             var currentRot = dummy.transform.rotation;
             var currentScale = dummy.transform.localScale;
             var currentPos = dummy.transform.localPosition;
@@ -145,25 +118,27 @@ namespace lockerMod_SN {
             dummy.transform.localScale = Vector3.one;
             dummy.transform.position = Vector3.zero;
             var renderers = dummy.GetComponentsInChildren<Renderer>();
-            if (renderers.Length == 0) return new Bounds(dummy.transform.position, Vector3.zero);
+            if (renderers.Length == 0)
+                return new Bounds(dummy.transform.position, Vector3.zero);
             var b = renderers[0].bounds;
             foreach (Renderer r in renderers)
-                if (r is MeshRenderer || r is SkinnedMeshRenderer) b.Encapsulate(r.bounds);
+                if (r is MeshRenderer || r is SkinnedMeshRenderer)
+                    b.Encapsulate(r.bounds);
             dummy.transform.rotation = currentRot;
             dummy.transform.localScale = currentScale;
             dummy.transform.position = currentPos;
-            return Quirk.overrideBounds[comp.classId] = b;
+            return Quirk.overrideBounds[comp.prefabId] = b;
         }
 
         private static float GetIdealDeltaScale(GameObject dummy) {
-            var comp = dummy.GetComponent<LockerModData>();
-            return Quirk.overrideDeltaScale.ContainsKey(comp.classId) ?
-                Quirk.overrideDeltaScale[comp.classId] :
+            var comp = dummy.GetComponent<VisibleLockerInteriorDummyData>();
+            return Quirk.overrideDeltaScale.ContainsKey(comp.prefabId) ?
+                Quirk.overrideDeltaScale[comp.prefabId] :
                 1;
         }
 
-        private static GameObject GetInteriorInstance(StorageContainer storageContainer) {
-            var locker = storageContainer.prefabRoot;
+        private static GameObject GetInteriorInstance(StorageContainer sc) {
+            var locker = sc.prefabRoot;
             var interiorTransform = locker.transform.Find(interiorName);
             if (interiorTransform) return interiorTransform.gameObject;
             var interiorObject = new GameObject(interiorName);
@@ -191,16 +166,18 @@ namespace lockerMod_SN {
 
         private static List<GameObject> GetSortedDummies(GameObject lockerInterior) {
             var result = new List<GameObject>(lockerInterior.transform.childCount);
-            foreach (Transform dummyTransform in lockerInterior.transform) result.Add(dummyTransform.gameObject);
+            foreach (Transform dummyTransform in lockerInterior.transform)
+                result.Add(dummyTransform.gameObject);
             result.Sort(
                 (g1, g2) => 
                 CompareTechType(
-                    g1.GetComponent<LockerModData>().type,
-                    g2.GetComponent<LockerModData>().type
+                    g1.GetComponent<VisibleLockerInteriorDummyData>().techType,
+                    g2.GetComponent<VisibleLockerInteriorDummyData>().techType
                 )
             );
             return result;
         }
+
         private static int CompareTechType(TechType t1, TechType t2) {
             var size1 = CraftData.GetItemSize(t1);
             var size2 = CraftData.GetItemSize(t2);
@@ -212,5 +189,10 @@ namespace lockerMod_SN {
             var a2 = size2.x * size2.y;
             return a1 == a2 ? size2.y.CompareTo(size1.y) : a2.CompareTo(a1);
         }
+    }
+
+    internal class VisibleLockerInteriorDummyData : MonoBehaviour {
+        public TechType techType;
+        public string prefabId;
     }
 }
