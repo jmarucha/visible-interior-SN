@@ -135,6 +135,9 @@ namespace VisibleLockerInterior {
                 case TechType.Scanner:
                 case TechType.AirBladder:
                 case TechType.Welder:
+                case TechType.Seaglide:
+                case TechType.Constructor:
+                case TechType.StasisRifle:
                 case TechType.HoleFish:
                 case TechType.Peeper:
                 case TechType.Oculus:
@@ -145,14 +148,21 @@ namespace VisibleLockerInterior {
                 case TechType.Hoverfish:
                 case TechType.Reginald:
                 case TechType.Spadefish:
+                case TechType.Floater:
                 case TechType.Hoopfish:
                 case TechType.Spinefish:
                 case TechType.LavaBoomerang:
                 case TechType.LavaEyeye:
-                case TechType.Constructor:
-                case TechType.StasisRifle:
-                case TechType.Seaglide:
-                case TechType.Floater:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsKelp(TechType techType) {
+            switch (techType) {
+                case TechType.CreepvineSeedCluster:
+                case TechType.CreepvinePiece:
                     return true;
                 default:
                     return false;

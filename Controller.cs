@@ -96,6 +96,11 @@ namespace VisibleLockerInterior {
                 foreach (var comp in destroyList) GameObject.DestroyImmediate(comp);
             } while (destroyList.Count > 0);
 
+            if (Quirk.IsKelp(techType))
+                foreach (var r in obj.GetComponents<Renderer>())
+                    foreach (var m in r.materials)
+                        m.DisableKeyword("FX_KELP");
+
             foreach (Transform childTransform in obj.transform)
                 SanitizeObject(childTransform.gameObject, techType);
         }
