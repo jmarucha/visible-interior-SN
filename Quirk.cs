@@ -13,6 +13,7 @@ namespace VisibleLockerInterior {
             "a6dac068-6f8d-4e32-b5e7-2e34a9f97d11";
         public const string Coral_reef_purple_mushrooms_01_04 =
             "99cdec62-302b-4999-ba49-f50c73575a4d";
+        public const string CreepvineSeed = "e0b1f772-b1bd-43a3-9b56-5f6979aab42d";
         public const string Flashlight = "12c95e66-fb54-47b3-87f1-8e318394b839";
         public const string Gravsphere = "d11dfcc3-bce7-4870-a112-65a5dab5141b";
         public const string JeweledDiskPiece = "b447ac10-bf6b-4005-8ffc-8d9a4e84450b";
@@ -101,6 +102,7 @@ namespace VisibleLockerInterior {
                 case TechType.AramidFibers:
                 case TechType.Compass:
                 case TechType.LuggageBag:
+                case TechType.CreepvinePiece:
                 case TechType.FirstAidKit:
                 case TechType.Coffee:
                 case TechType.LabEquipment1:
@@ -174,6 +176,7 @@ namespace VisibleLockerInterior {
                 { PrefabId.AirBladder, new Quaternion(0f, 0f, 0.03926f, 0.999229f) },
                 { PrefabId.builder, new Quaternion(-0.343891f, 0.61785f, -0.343891f, 0.61785f) },
                 { PrefabId.CoralChunk, new Quaternion(-0.530816f, -0.467155f, -0.530816f, 0.467155f) },
+                { PrefabId.CreepvineSeed, new Quaternion(-0.539688f, 0.272496f, 0.016512f, 0.796373f) },
                 { PrefabId.Flashlight, new Quaternion(-0.431926f, 0.559857f, -0.431926f, 0.559857f) },
                 { PrefabId.JeweledDiskPiece, new Quaternion(0.0185099f, 0.7068644f, -0.0185099f, 0.7068645f) },
                 { PrefabId.kyanite, new Quaternion(0.728072f, -0.000635f, -0.000598f, 0.685501f) },
@@ -226,6 +229,13 @@ namespace VisibleLockerInterior {
                     new Bounds(
                         new Vector3(0.01348841f, 0.04119494f, -0.08201248f),
                         new Vector3(0.2903295f, 0.1559973f, 0.3067509f)
+                    )
+                },
+                {
+                    PrefabId.CreepvineSeed,
+                    new Bounds(
+                        new Vector3(-0.005938541f, 0.02861457f, 0.0419246f),
+                        new Vector3(0.2162237f, 0.3219777f, 0.5130358f)
                     )
                 },
                 {
